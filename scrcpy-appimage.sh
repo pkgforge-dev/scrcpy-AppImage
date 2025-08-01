@@ -14,6 +14,7 @@ mkdir -p ./AppDir/share && (
 
 	# desktop, icon, app data files
 	cp -v  /usr/share/applications/scrcpy.desktop           ./
+	cp -v  /usr/share/icons/hicolor/256x256/apps/scrcpy.png ./
 	cp -v  /usr/share/icons/hicolor/256x256/apps/scrcpy.png ./.DirIcon
 	cp -rv /usr/share/scrcpy                                ./share
 	sed -i -e 's|Exec=.*|Exec=scrcpy|g' ./scrcpy.desktop
