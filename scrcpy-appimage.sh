@@ -43,6 +43,7 @@ mkdir -p ./AppDir/share && (
 
 	# needed for app to find its data files
 	echo 'SCRCPY_SERVER_PATH=${SHARUN_DIR}/share/scrcpy/scrcpy-server' >> ./.env
+	echo 'SCRCPY_ICON_PATH=${SHARUN_DIR}/scrcpy.png' >> ./.env
 )
 
 VERSION="$(./AppDir/AppRun --version | awk '{print $2; exit}')"
