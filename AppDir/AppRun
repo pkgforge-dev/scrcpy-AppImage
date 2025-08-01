@@ -3,6 +3,7 @@
 set -e
 
 CURRENTDIR="$(cd "${0%/*}" && echo "$PWD")"
+CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
 export SCRCPY_SERVER_PATH="$CURRENTDIR"/share/scrcpy/scrcpy-server
 export SCRCPY_ICON_PATH="$CURRENTDIR"/scrcpy.png
 
@@ -40,14 +41,14 @@ _install_udev_rules() {
 		exit 1
 	fi
 
-	cd "$CURRENTDIR"/udev-installer
+	cp -rv "$CURRENTDIR"/udev-installer "$CACHEDIR"/scrcpy-appimage-udev-installer
+	cd "$CACHEDIR"/scrcpy-appimage-udev-installer
 	"$SUDOCMD" ./install.sh
 }
-
-_check_udev_file || true
 
 if [ "$1" = '--get-udev' ]; then
 	_install_udev_rules
 else
+	_check_udev_file || true
 	exec "$CURRENTDIR"/bin/scrcpy "$@"
 fi
