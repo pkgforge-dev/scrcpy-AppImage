@@ -9,8 +9,14 @@ SHARUN="https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$ARCH
 UPINFO="gh-releases-zsync|$(echo "$GITHUB_REPOSITORY" | tr '/' '|')|latest|*$ARCH.AppImage.zsync"
 
 # Prepare AppDir
-mkdir -p ./AppDir && (
+mkdir -p ./AppDir/share && (
 	cd ./AppDir
+
+	# desktop, icon, app data files
+	cp -v  /usr/share/applications/scrcpy.desktop           ./
+	cp -v  /usr/share/icons/hicolor/256x256/apps/scrcpy.png ./.DirIcon
+	cp -rv /usr/share/scrcpy                                ./share
+	sed -i -e 's|Exec=.*|Exec=scrcpy|g' ./scrcpy.desktop
 
 	# ADD LIBRARIES
 	wget --retry-connrefused --tries=30 "$SHARUN" -O ./sharun-aio
@@ -35,16 +41,8 @@ mkdir -p ./AppDir && (
 	ln ./sharun ./AppRun
 	./sharun -g
 
-	# binary is hardcoded to look for /usr/share
-	sed -i -e 's|/usr/share|././/share|g' ./shared/bin/scrcpy
-	echo 'SHARUN_WORKING_DIR=${SHARUN_DIR}' >> ./.env
-
-	# desktop, icon, app data files
-	cp -v  /usr/share/applications/scrcpy.desktop           ./
-	cp -v  /usr/share/icons/hicolor/256x256/apps/scrcpy.png ./.DirIcon
-	cp -rv /usr/share/scrcpy                                ./share
-
-	sed -i -e 's|Exec=.*|Exec=scrcpy|g' ./scrcpy.desktop
+	# needed for app to find its data files
+	echo 'SCRCPY_SERVER_PATH=${SHARUN_DIR}/share/scrcpy/scrcpy-server' >> ./.env
 )
 
 VERSION="$(./AppDir/AppRun --version | awk '{print $2; exit}')"
