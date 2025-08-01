@@ -1,0 +1,52 @@
+#!/bin/sh
+
+set -e
+
+CURRENTDIR="$(cd "${0%/*}" && echo "$PWD")"
+export SCRCPY_SERVER_PATH="$CURRENTDIR"/share/scrcpy/scrcpy-server
+export SCRCPY_ICON_PATH="$CURRENTDIR"/scrcpy.png
+
+_check_udev_file() (
+	set -- \
+		/etc/udev/rules.d/*-android.rules \
+		/usr/lib/udev/rules.d/*-android.rules
+
+	for file do
+		if [ -f "$file" ]; then
+			return 0
+		fi
+	done
+
+	>&2 echo "WARNING: android udev rules are missing, things will likely break!"
+	>&2 echo "Run '${APPIMAGE:-$0} --get-udev' to install them or use your distro package manager to do so"
+
+	if command -v notify-send 1>/dev/null; then
+		notify-send -u critical "WARNING: Missing udev rules!"
+	fi
+
+	return 1
+)
+
+_install_udev_rules() {
+	if _check_udev_file 2>/dev/null; then
+		>&2 echo "android udev rules are already installed!"
+		exit 1
+	elif command -v sudo 1>/dev/null; then
+		SUDOCMD="sudo"
+	elif command -v doas 1>/dev/null; then
+		SUDOCMD="doas"
+	else
+		>&2 echo "ERROR: You need sudo or doas to use this function"
+		exit 1
+	fi
+
+	"$SUDOCMD" "$CURRENTDIR"/bin/install_udev_rules.sh
+}
+
+_check_udev_file
+
+if [ "$1" = '--get-udev' ]; then
+	_install_udev_rules
+else
+	exec "$CURRENTDIR"/bin/scrcpy "$@"
+fi
