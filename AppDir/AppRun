@@ -40,7 +40,8 @@ _install_udev_rules() {
 		exit 1
 	fi
 
-	"$SUDOCMD" "$CURRENTDIR"/bin/install_udev_rules.sh
+	cd "$CURRENTDIR"/udev-installer
+	"$SUDOCMD" ./install.sh
 }
 
 _check_udev_file || true
