@@ -41,6 +41,7 @@ _install_udev_rules() {
 		exit 1
 	fi
 
+	mkdir -p "$CACHEDIR"
 	cp -rv "$CURRENTDIR"/udev-installer "$CACHEDIR"/scrcpy-appimage-udev-installer
 	cd "$CACHEDIR"/scrcpy-appimage-udev-installer
 	"$SUDOCMD" ./install.sh
