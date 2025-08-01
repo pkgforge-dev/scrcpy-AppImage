@@ -29,7 +29,7 @@ _check_udev_file() (
 
 _install_udev_rules() {
 	if _check_udev_file 2>/dev/null; then
-		>&2 echo "android udev rules are already installed!"
+		>&2 echo "Android udev rules are already installed!"
 		exit 1
 	elif command -v sudo 1>/dev/null; then
 		SUDOCMD="sudo"
