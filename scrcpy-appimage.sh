@@ -34,6 +34,10 @@ mkdir -p ./AppDir && (
 	ln ./sharun ./AppRun
 	./sharun -g
 
+	# binary is hardcoded to look for /usr/share
+	sed -i -e 's|/usr/share|././/share|g' ./shared/bin/scrcpy
+	echo 'SHARUN_WORKING_DIR=${SHARUN_DIR}' >> ./.env
+
 	# desktop, icon, app data files
 	cp -v  /usr/share/applications/scrcpy.desktop           ./
 	cp -v  /usr/share/icons/hicolor/256x256/apps/scrcpy.png ./.DirIcon
