@@ -20,6 +20,7 @@ mkdir -p ./AppDir && (
 		/usr/bin/scrcpy               \
 		/usr/bin/adb                  \
 		/usr/lib/libSDL*              \
+		/usr/lib/libavcodec.so*       \
 		/usr/lib/libGLX*              \
 		/usr/lib/libEGL*              \
 		/usr/lib/dri/*                \
