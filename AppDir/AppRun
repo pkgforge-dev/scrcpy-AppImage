@@ -43,7 +43,7 @@ _install_udev_rules() {
 	"$SUDOCMD" "$CURRENTDIR"/bin/install_udev_rules.sh
 }
 
-_check_udev_file
+_check_udev_file || true
 
 if [ "$1" = '--get-udev' ]; then
 	_install_udev_rules
