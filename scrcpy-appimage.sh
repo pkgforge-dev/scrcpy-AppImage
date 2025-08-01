@@ -39,12 +39,12 @@ mkdir -p ./AppDir/share && (
 	rm -f ./sharun-aio
 
 	# Prepare sharun
-	ln ./sharun ./AppRun
+	chmod +x ./AppRun
 	./sharun -g
 
-	# needed for app to find its data files
-	echo 'SCRCPY_SERVER_PATH=${SHARUN_DIR}/share/scrcpy/scrcpy-server' >> ./.env
-	echo 'SCRCPY_ICON_PATH=${SHARUN_DIR}/scrcpy.png' >> ./.env
+	# Add udev rules installer
+	git clone "https://github.com/M0Rf30/android-udev-rules.git" ./udev-installer
+	rm -rf ./udev-installer/.github ./udev-installer/.git
 )
 
 VERSION="$(./AppDir/AppRun --version | awk '{print $2; exit}')"
