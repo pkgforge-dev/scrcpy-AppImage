@@ -39,6 +39,7 @@ mkdir -p ./AppDir/share && (
 	rm -f ./sharun-aio
 
 	# Prepare sharun
+	chmod +x ./AppRun
 	./sharun -g
 
 	# Add udev rules installer
