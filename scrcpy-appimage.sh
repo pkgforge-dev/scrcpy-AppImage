@@ -9,7 +9,7 @@ SHARUN="https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$ARCH
 UPINFO="gh-releases-zsync|$(echo "$GITHUB_REPOSITORY" | tr '/' '|')|latest|*$ARCH.AppImage.zsync"
 
 # Prepare AppDir
-mv -v ./scrcpy/release/work/build-linux-"$ARCH"/dist ./AppDir
+mv -v ./scrcpy/release/work/build-linux-"$ARCH"/dist/* ./AppDir
 
 mkdir -p ./AppDir/share ./AppDir/shared/bin ./AppDir/bin && (
 	cd ./AppDir
