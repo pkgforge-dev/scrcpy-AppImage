@@ -59,6 +59,7 @@ rm -f ./*.pkg.tar.zst
 
 echo "Building mostly static scrcpy"
 git clone "https://github.com/Genymobile/scrcpy.git" ./scrcpy
+cd ./scrcpy
 ./release/build_linux.sh "$ARCH"
 
 echo "All done!"
