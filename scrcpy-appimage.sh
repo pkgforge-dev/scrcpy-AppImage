@@ -8,15 +8,26 @@ URUNTIME_LITE="https://github.com/VHSgunzo/uruntime/releases/latest/download/uru
 SHARUN="https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$ARCH-aio"
 UPINFO="gh-releases-zsync|$(echo "$GITHUB_REPOSITORY" | tr '/' '|')|latest|*$ARCH.AppImage.zsync"
 
-# Prepare AppDir
-mkdir -p ./AppDir/share && (
-	cd ./AppDir
+DESKTOP="https://raw.githubusercontent.com/Genymobile/scrcpy/refs/heads/master/app/data/scrcpy.desktop"
 
+# Prepare AppDir
+mv -v ./scrcpy/release/work/build-linux-"$ARCH"/dist/* ./AppDir
+
+mkdir -p ./AppDir/share ./AppDir/shared/bin ./AppDir/bin && (
+	cd ./AppDir
+	mv -v ./scrcpy        ./shared/bin
+	mv -v ./adb           ./shared/bin
+	mv -v ./scrcpy.1      ./bin
+
+	cp -v ./icon.png ./.DirIcon
+	cp -v ./icon.png ./scrcpy.png
+	mv -v ./icon.png ./bin
+
+	# get server binary
+	cp -v /usr/share/scrcpy/scrcpy-server ./bin/scrcpy-server
+	
 	# desktop, icon, app data files
-	cp -v  /usr/share/applications/scrcpy.desktop           ./
-	cp -v  /usr/share/icons/hicolor/256x256/apps/scrcpy.png ./
-	cp -v  /usr/share/icons/hicolor/256x256/apps/scrcpy.png ./.DirIcon
-	cp -rv /usr/share/scrcpy                                ./share
+	wget --retry-connrefused --tries=30 "$DESKTOP" -O ./scrcpy.desktop
 	sed -i -e 's|Exec=.*|Exec=scrcpy|g' ./scrcpy.desktop
 
 	# ADD LIBRARIES
@@ -24,12 +35,8 @@ mkdir -p ./AppDir/share && (
 	chmod +x ./sharun-aio
 	xvfb-run -a -- \
 		./sharun-aio l -p -v -e -s -k \
-		/usr/bin/scrcpy               \
-		/usr/bin/adb                  \
-		/usr/lib/libSDL*              \
-		/usr/lib/libavcodec.so*       \
-		/usr/lib/libGLX*              \
-		/usr/lib/libEGL*              \
+		./shared/bin/*                \
+		/usr/lib/lib*GL*              \
 		/usr/lib/dri/*                \
 		/usr/lib/gbm/*                \
 		/usr/lib/pipewire-*/*         \
