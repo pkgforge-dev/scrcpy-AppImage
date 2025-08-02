@@ -29,6 +29,7 @@ pacman -Syu --noconfirm \
 	libxrandr         \
 	libxtst           \
 	mesa              \
+	meson             \
 	ninja             \
 	patch             \
 	perl              \
