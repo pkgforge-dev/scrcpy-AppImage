@@ -31,6 +31,7 @@ pacman -Syu --noconfirm \
 	mesa              \
 	ninja             \
 	patch             \
+	perl              \
 	pipewire-audio    \
 	pulseaudio        \
 	pulseaudio-alsa   \
@@ -51,7 +52,7 @@ OPUS_URL="https://github.com/pkgforge-dev/llvm-libs-debloated/releases/download/
 wget --retry-connrefused --tries=30 "$LLVM_URL"   -O  ./llvm-libs.pkg.tar.zst
 wget --retry-connrefused --tries=30 "$MESA_URL"   -O  ./mesa.pkg.tar.zst
 wget --retry-connrefused --tries=30 "$LIBXML_URL" -O  ./libxml2.pkg.tar.zst
-wget --retry-connrefused --tries=30 "$FFMPEG_URL" -O  ./ffmpeg-mini.pkg.tar.zst
+#wget --retry-connrefused --tries=30 "$FFMPEG_URL" -O  ./ffmpeg-mini.pkg.tar.zst
 wget --retry-connrefused --tries=30 "$OPUS_URL"   -O  ./opus.pkg.tar.zst
 
 pacman -U --noconfirm ./*.pkg.tar.zst
