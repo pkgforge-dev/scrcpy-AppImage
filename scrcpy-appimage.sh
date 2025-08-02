@@ -21,6 +21,7 @@ mkdir -p ./AppDir/share ./AppDir/shared/bin ./AppDir/bin && (
 	mv -v ./scrcpy.1      ./bin
 
 	cp -v ./icon.png ./.DirIcon
+	cp -v ./icon.png ./scrcpy.png
 	mv -v ./icon.png ./bin
 
 	# get server binary
