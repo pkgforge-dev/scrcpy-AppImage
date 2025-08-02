@@ -4,7 +4,7 @@ set -e
 
 CURRENTDIR="$(cd "${0%/*}" && echo "$PWD")"
 CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
-export SCRCPY_SERVER_PATH="$CURRENTDIR"/share/scrcpy/scrcpy-server
+export SCRCPY_SERVER_PATH="$CURRENTDIR"/bin/scrcpy-server
 export SCRCPY_ICON_PATH="$CURRENTDIR"/scrcpy.png
 
 _check_udev_file() (
