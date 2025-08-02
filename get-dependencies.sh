@@ -3,7 +3,6 @@
 set -eux
 
 ARCH="$(uname -m)"
-export PATH="$PATH:/usr/bin/core_perl"
 
 case "$ARCH" in
 	'x86_64')  PKG_TYPE='x86_64.pkg.tar.zst';;
@@ -37,6 +36,7 @@ pacman -Syu --noconfirm \
 	pulseaudio        \
 	pulseaudio-alsa   \
 	sdl2              \
+	unzip             \
 	wget              \
 	xorg-server-xvfb  \
 	zsync
@@ -62,6 +62,10 @@ rm -f ./*.pkg.tar.zst
 echo "Building mostly static scrcpy"
 git clone "https://github.com/Genymobile/scrcpy.git" ./scrcpy
 cd ./scrcpy
+# path needs to be updated to incldue perl
+export PATH="$PATH:/usr/bin/core_perl"
+
+# do the thing
 ./release/build_linux.sh "$ARCH"
 
 echo "All done!"
