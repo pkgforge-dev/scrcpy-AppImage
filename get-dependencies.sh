@@ -3,6 +3,7 @@
 set -eux
 
 ARCH="$(uname -m)"
+export PATH="$PATH:/usr/bin/core_perl"
 
 case "$ARCH" in
 	'x86_64')  PKG_TYPE='x86_64.pkg.tar.zst';;
