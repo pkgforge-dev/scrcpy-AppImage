@@ -8,6 +8,9 @@ URUNTIME_LITE="https://github.com/VHSgunzo/uruntime/releases/latest/download/uru
 SHARUN="https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$ARCH-aio"
 UPINFO="gh-releases-zsync|$(echo "$GITHUB_REPOSITORY" | tr '/' '|')|latest|*$ARCH.AppImage.zsync"
 
+SERVER="$(wget "https://api.github.com/repos/Genymobile/scrcpy/releases" -O - \
+	| sed 's/[()",{} ]/\n/g' | grep -o "https.*scrcpy-server.*" | head -1)"
+
 # Prepare AppDir
 mv -v ./scrcpy/release/work/build-linux-"$ARCH"/dist/* ./AppDir
 
@@ -15,11 +18,13 @@ mkdir -p ./AppDir/share ./AppDir/shared/bin ./AppDir/bin && (
 	cd ./AppDir
 	mv -v ./scrcpy        ./shared/bin
 	mv -v ./adb           ./shared/bin
-	mv -v ./scrcpy-server ./share/scrcpy
 	mv -v ./scrcpy.1      ./bin
 
 	cp -v ./icon.png ./.DirIcon
 	mv -v ./icon.png ./bin
+
+	# get server binary
+	wget --retry-connrefused --tries=30 "$SERVER" -O ./bin/scrcpy-server
 	
 	# desktop, icon, app data files
 	wget --retry-connrefused --tries=30 "$DESKTOP" -O ./scrcpy.desktop
