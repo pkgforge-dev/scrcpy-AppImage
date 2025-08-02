@@ -36,8 +36,7 @@ mkdir -p ./AppDir/share ./AppDir/shared/bin ./AppDir/bin && (
 	xvfb-run -a -- \
 		./sharun-aio l -p -v -e -s -k \
 		./shared/bin/*                \
-		/usr/lib/libGLX*              \
-		/usr/lib/libEGL*              \
+		/usr/lib/lib*GL*              \
 		/usr/lib/dri/*                \
 		/usr/lib/gbm/*                \
 		/usr/lib/pipewire-*/*         \
