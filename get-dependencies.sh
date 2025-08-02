@@ -13,12 +13,14 @@ esac
 echo "Installing build dependencies..."
 echo "---------------------------------------------------------------"
 pacman -Syu --noconfirm \
-  android-tools     \
+  	android-tools     \
 	base-devel        \
 	curl              \
+	ffmpeg            \
 	fontconfig        \
 	freetype2         \
 	git               \
+	libusb            \
 	libxcb            \
 	libxcursor        \
 	libxi             \
@@ -27,11 +29,12 @@ pacman -Syu --noconfirm \
 	libxrandr         \
 	libxtst           \
 	mesa              \
+	ninja             \
 	patch             \
 	pipewire-audio    \
 	pulseaudio        \
 	pulseaudio-alsa   \
-  scrcpy            \
+	sdl2              \
 	wget              \
 	xorg-server-xvfb  \
 	zsync
@@ -48,12 +51,15 @@ OPUS_URL="https://github.com/pkgforge-dev/llvm-libs-debloated/releases/download/
 wget --retry-connrefused --tries=30 "$LLVM_URL"   -O  ./llvm-libs.pkg.tar.zst
 wget --retry-connrefused --tries=30 "$MESA_URL"   -O  ./mesa.pkg.tar.zst
 wget --retry-connrefused --tries=30 "$LIBXML_URL" -O  ./libxml2.pkg.tar.zst
-wget --retry-connrefused --tries=30 "$FFMPEG_URL" -O ./ffmpeg-mini.pkg.tar.zst
+wget --retry-connrefused --tries=30 "$FFMPEG_URL" -O  ./ffmpeg-mini.pkg.tar.zst
 wget --retry-connrefused --tries=30 "$OPUS_URL"   -O  ./opus.pkg.tar.zst
 
 pacman -U --noconfirm ./*.pkg.tar.zst
 rm -f ./*.pkg.tar.zst
 
+echo "Building mostly static scrcpy"
+git clone "https://github.com/Genymobile/scrcpy.git" ./scrcpy
+./release/build_linux.sh "$ARCH"
 
 echo "All done!"
 echo "---------------------------------------------------------------"
