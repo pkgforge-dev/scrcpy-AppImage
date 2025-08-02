@@ -37,6 +37,7 @@ pacman -Syu --noconfirm \
 	pipewire-audio    \
 	pulseaudio        \
 	pulseaudio-alsa   \
+	scrcpy            \
 	sdl2              \
 	unzip             \
 	wget              \
