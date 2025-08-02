@@ -9,14 +9,20 @@ SHARUN="https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$ARCH
 UPINFO="gh-releases-zsync|$(echo "$GITHUB_REPOSITORY" | tr '/' '|')|latest|*$ARCH.AppImage.zsync"
 
 # Prepare AppDir
-mkdir -p ./AppDir/share && (
-	cd ./AppDir
+mv -v ./scrcpy/release/work/build-linux-"$ARCH"/dist ./AppDir
 
+mkdir -p ./AppDir/share ./AppDir/shared/bin ./AppDir/bin && (
+	cd ./AppDir
+	mv -v ./scrcpy        ./shared/bin
+	mv -v ./adb           ./shared/bin
+	mv -v ./scrcpy-server ./share/scrcpy
+	mv -v ./scrcpy.1      ./bin
+
+	cp -v ./icon.png ./.DirIcon
+	mv -v ./icon.png ./bin
+	
 	# desktop, icon, app data files
-	cp -v  /usr/share/applications/scrcpy.desktop           ./
-	cp -v  /usr/share/icons/hicolor/256x256/apps/scrcpy.png ./
-	cp -v  /usr/share/icons/hicolor/256x256/apps/scrcpy.png ./.DirIcon
-	cp -rv /usr/share/scrcpy                                ./share
+	wget --retry-connrefused --tries=30 "$DESKTOP" -O ./scrcpy.desktop
 	sed -i -e 's|Exec=.*|Exec=scrcpy|g' ./scrcpy.desktop
 
 	# ADD LIBRARIES
@@ -24,10 +30,7 @@ mkdir -p ./AppDir/share && (
 	chmod +x ./sharun-aio
 	xvfb-run -a -- \
 		./sharun-aio l -p -v -e -s -k \
-		/usr/bin/scrcpy               \
-		/usr/bin/adb                  \
-		/usr/lib/libSDL*              \
-		/usr/lib/libavcodec.so*       \
+		./shared/bin/*                \
 		/usr/lib/libGLX*              \
 		/usr/lib/libEGL*              \
 		/usr/lib/dri/*                \
