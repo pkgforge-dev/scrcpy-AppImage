@@ -30,6 +30,7 @@ pacman -Syu --noconfirm \
 	libxtst           \
 	mesa              \
 	meson             \
+	nasm              \
 	ninja             \
 	patch             \
 	perl              \
