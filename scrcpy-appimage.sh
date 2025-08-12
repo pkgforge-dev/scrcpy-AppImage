@@ -1,60 +1,32 @@
 #!/bin/sh
 
-set -ex
+set -eux
 
 ARCH="$(uname -m)"
-URUNTIME="https://github.com/VHSgunzo/uruntime/releases/latest/download/uruntime-appimage-dwarfs-$ARCH"
-URUNTIME_LITE="https://github.com/VHSgunzo/uruntime/releases/latest/download/uruntime-appimage-dwarfs-lite-$ARCH"
-SHARUN="https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$ARCH-aio"
-UPINFO="gh-releases-zsync|$(echo "$GITHUB_REPOSITORY" | tr '/' '|')|latest|*$ARCH.AppImage.zsync"
+URUNTIME="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/uruntime2appimage.sh"
+SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
+BINS_SOURCE="$PWD"/scrcpy/release/work/build-linux-"$ARCH"/dist
 
-DESKTOP="https://raw.githubusercontent.com/Genymobile/scrcpy/refs/heads/master/app/data/scrcpy.desktop"
+export ADD_HOOKS="self-updater.bg.hook:udev-installer.hook"
+export UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest|*$ARCH.AppImage.zsync"
+export DEPLOY_OPENGL=1
+export DEPLOY_PIPEWIRE=1
+export ICON="$BINS_SOURCE"/icon.png
+export DESKTOP="https://raw.githubusercontent.com/Genymobile/scrcpy/refs/heads/master/app/data/scrcpy.desktop"
 
-# Prepare AppDir
-mv -v ./scrcpy/release/work/build-linux-"$ARCH"/dist/* ./AppDir
+# ADD LIBRARIES
+wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun
+chmod +x ./quick-sharun
+./quick-sharun "$BINS_SOURCE"/*
 
-mkdir -p ./AppDir/share ./AppDir/shared/bin ./AppDir/bin && (
-	cd ./AppDir
-	mv -v ./scrcpy        ./shared/bin
-	mv -v ./adb           ./shared/bin
-	mv -v ./scrcpy.1      ./bin
+cp -v /usr/share/scrcpy/scrcpy-server  ./AppDir/bin # get server binary
+cp -v "$BINS_SOURCE"/scrcpy.1          ./AppDir/bin
+sed -i -e 's|Exec=.*|Exec=scrcpy|g'    ./AppDir/*.desktop
 
-	cp -v ./icon.png ./.DirIcon
-	cp -v ./icon.png ./scrcpy.png
-	mv -v ./icon.png ./bin
 
-	# get server binary
-	cp -v /usr/share/scrcpy/scrcpy-server ./bin/scrcpy-server
-	
-	# desktop, icon, app data files
-	wget --retry-connrefused --tries=30 "$DESKTOP" -O ./scrcpy.desktop
-	sed -i -e 's|Exec=.*|Exec=scrcpy|g' ./scrcpy.desktop
 
-	# ADD LIBRARIES
-	wget --retry-connrefused --tries=30 "$SHARUN" -O ./sharun-aio
-	chmod +x ./sharun-aio
-	xvfb-run -a -- \
-		./sharun-aio l -p -v -e -s -k \
-		./shared/bin/*                \
-		/usr/lib/lib*GL*              \
-		/usr/lib/dri/*                \
-		/usr/lib/gbm/*                \
-		/usr/lib/pipewire-*/*         \
-		/usr/lib/spa-*/*/*            \
-		/usr/lib/pulseaudio/*         \
-		/usr/lib/gconv/*
-	rm -f ./sharun-aio
 
-	# Prepare sharun
-	chmod +x ./AppRun
-	./sharun -g
-
-	# Add udev rules installer
-	git clone "https://github.com/M0Rf30/android-udev-rules.git" ./udev-installer
-	rm -rf ./udev-installer/.github ./udev-installer/.git
-)
-
-VERSION="$(./AppDir/AppRun --version | awk '{print $2; exit}')"
+export VERSION="$(./AppDir/AppRun --version | awk '{print $2; exit}')"
 [ -n "$VERSION" ] && echo "$VERSION" > ~/version
 
 # MAKE APPIMAGE WITH URUNTIME
@@ -90,7 +62,6 @@ echo "Generating [dwfs]AppBundle..."
 	--add-appdir ./AppDir                     \
 	--output-to ./scrcpy-"$VERSION"-anylinux-"$ARCH".dwfs.AppBundle
 
-zsyncmake ./*.AppImage -u  ./*.AppImage
 zsyncmake ./*.AppBundle -u ./*.AppBundle
 
 mkdir -p ./dist
