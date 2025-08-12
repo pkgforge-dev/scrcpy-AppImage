@@ -9,6 +9,7 @@ BINS_SOURCE="$PWD"/scrcpy/release/work/build-linux-"$ARCH"/dist
 
 export ADD_HOOKS="self-updater.bg.hook:udev-installer.hook"
 export UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest|*$ARCH.AppImage.zsync"
+export DEPLOY_OPENGL=1
 export DEPLOY_PIPEWIRE=1
 export ICON="$BINS_SOURCE"/icon.png
 export DESKTOP="https://raw.githubusercontent.com/Genymobile/scrcpy/refs/heads/master/app/data/scrcpy.desktop"
