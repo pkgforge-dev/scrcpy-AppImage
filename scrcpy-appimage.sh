@@ -20,33 +20,22 @@ chmod +x ./quick-sharun
 ./quick-sharun "$BINS_SOURCE"/*
 
 cp -v /usr/share/scrcpy/scrcpy-server  ./AppDir/bin # get server binary
-cp -v "$BINS_SOURCE"/scrcpy.1          ./AppDir/bin
+cp -v "$BINS_SOURCE"/scrcpy.1          ./AppDir/bin # man page?
 sed -i -e 's|Exec=.*|Exec=scrcpy|g'    ./AppDir/*.desktop
+echo 'SCRCPY_SERVER_PATH=${SHARUN_DIR}/bin/scrcpy-server' >> ./AppDir/.env
+echo 'SCRCPY_ICON_PATH=${SHARUN_DIR}/icon.png'            >> ./AppDir/.env
 
-
-
-
-export VERSION="$(./AppDir/AppRun --version | awk '{print $2; exit}')"
-[ -n "$VERSION" ] && echo "$VERSION" > ~/version
+# We also need to be added to a group after installing udev rules
+sed -i '/cp -v/a	 groupadd -f adbusers; usermod -a -G adbusers $(logname)' ./AppDir/bin/udev-installer.hook
 
 # MAKE APPIMAGE WITH URUNTIME
-wget --retry-connrefused --tries=30 "$URUNTIME"      -O  ./uruntime
-wget --retry-connrefused --tries=30 "$URUNTIME_LITE" -O  ./uruntime-lite
-chmod +x ./uruntime*
+export VERSION="$(./AppDir/AppRun --version | awk '{print $2; exit}')"
+export OUTNAME=scrcpy-"$VERSION"-anylinux-"$ARCH".AppImage
+[ -n "$VERSION" ] && echo "$VERSION" > ~/version
 
-# Add udpate info to runtime
-echo "Adding update information \"$UPINFO\" to runtime..."
-./uruntime-lite --appimage-addupdinfo "$UPINFO"
+wget --retry-connrefused --tries=30 "$URUNTIME" -O ./uruntime2appimage
+./uruntime2appimage
 
-echo "Generating AppImage..."
-./uruntime \
-	--appimage-mkdwarfs -f               \
-	--set-owner 0 --set-group 0          \
-	--no-history --no-create-timestamp   \
-	--compression zstd:level=22 -S26 -B8 \
-	--header uruntime-lite               \
-	-i ./AppDir                          \
-	-o ./scrcpy-"$VERSION"-anylinux-"$ARCH".AppImage
 
 # make appbundle
 UPINFO="$(echo "$UPINFO" | sed 's#.AppImage.zsync#*.AppBundle.zsync#g')"
@@ -61,7 +50,6 @@ echo "Generating [dwfs]AppBundle..."
 	--add-updinfo "$UPINFO"                   \
 	--add-appdir ./AppDir                     \
 	--output-to ./scrcpy-"$VERSION"-anylinux-"$ARCH".dwfs.AppBundle
-
 zsyncmake ./*.AppBundle -u ./*.AppBundle
 
 mkdir -p ./dist
