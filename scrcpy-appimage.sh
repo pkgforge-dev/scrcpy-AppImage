@@ -34,6 +34,7 @@ export OUTNAME=scrcpy-"$VERSION"-anylinux-"$ARCH".AppImage
 [ -n "$VERSION" ] && echo "$VERSION" > ~/version
 
 wget --retry-connrefused --tries=30 "$URUNTIME" -O ./uruntime2appimage
+chmod +x ./uruntime2appimage
 ./uruntime2appimage
 
 
