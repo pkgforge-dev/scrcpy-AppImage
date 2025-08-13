@@ -5,6 +5,7 @@ set -eux
 ARCH="$(uname -m)"
 URUNTIME="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/uruntime2appimage.sh"
 SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
+UDEV="https://raw.githubusercontent.com/M0Rf30/android-udev-rules/refs/heads/main/51-android.rules"
 BINS_SOURCE="$PWD"/scrcpy/release/work/build-linux-"$ARCH"/dist
 
 export ADD_HOOKS="self-updater.bg.hook:udev-installer.hook"
@@ -24,6 +25,10 @@ cp -v "$BINS_SOURCE"/scrcpy.1          ./AppDir/bin # man page?
 sed -i -e 's|Exec=.*|Exec=scrcpy|g'    ./AppDir/*.desktop
 echo 'SCRCPY_SERVER_PATH=${SHARUN_DIR}/bin/scrcpy-server' >> ./AppDir/.env
 echo 'SCRCPY_ICON_PATH=${SHARUN_DIR}/icon.png'            >> ./AppDir/.env
+
+# Add udev rules
+mkdir -p ./AppDir/etc/udev/rules.d
+wget --retry-connrefused --tries=30 "$UDEV" -O ./AppDir/etc/udev/rules.d/51-android.rules
 
 # We also need to be added to a group after installing udev rules
 sed -i '/cp -v/a	 groupadd -f adbusers; usermod -a -G adbusers $(logname)' ./AppDir/bin/udev-installer.hook
