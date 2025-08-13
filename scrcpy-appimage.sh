@@ -1,80 +1,47 @@
 #!/bin/sh
 
-set -ex
+set -eux
 
 ARCH="$(uname -m)"
-URUNTIME="https://github.com/VHSgunzo/uruntime/releases/latest/download/uruntime-appimage-dwarfs-$ARCH"
-URUNTIME_LITE="https://github.com/VHSgunzo/uruntime/releases/latest/download/uruntime-appimage-dwarfs-lite-$ARCH"
-SHARUN="https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$ARCH-aio"
-UPINFO="gh-releases-zsync|$(echo "$GITHUB_REPOSITORY" | tr '/' '|')|latest|*$ARCH.AppImage.zsync"
+URUNTIME="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/uruntime2appimage.sh"
+SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
+UDEV="https://raw.githubusercontent.com/M0Rf30/android-udev-rules/refs/heads/main/51-android.rules"
+BINS_SOURCE="$PWD"/scrcpy/release/work/build-linux-"$ARCH"/dist
 
-DESKTOP="https://raw.githubusercontent.com/Genymobile/scrcpy/refs/heads/master/app/data/scrcpy.desktop"
+export ADD_HOOKS="self-updater.bg.hook:udev-installer.hook"
+export UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest|*$ARCH.AppImage.zsync"
+export DEPLOY_OPENGL=1
+export DEPLOY_PIPEWIRE=1
+export ICON="$BINS_SOURCE"/icon.png
+export DESKTOP="https://raw.githubusercontent.com/Genymobile/scrcpy/refs/heads/master/app/data/scrcpy.desktop"
 
-# Prepare AppDir
-mv -v ./scrcpy/release/work/build-linux-"$ARCH"/dist/* ./AppDir
+# ADD LIBRARIES
+wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun
+chmod +x ./quick-sharun
+./quick-sharun "$BINS_SOURCE"/*
 
-mkdir -p ./AppDir/share ./AppDir/shared/bin ./AppDir/bin && (
-	cd ./AppDir
-	mv -v ./scrcpy        ./shared/bin
-	mv -v ./adb           ./shared/bin
-	mv -v ./scrcpy.1      ./bin
+cp -v /usr/share/scrcpy/scrcpy-server  ./AppDir/bin # get server binary
+cp -v "$BINS_SOURCE"/scrcpy.1          ./AppDir/bin # man page?
+sed -i -e 's|Exec=.*|Exec=scrcpy|g'    ./AppDir/*.desktop
+echo 'SCRCPY_SERVER_PATH=${SHARUN_DIR}/bin/scrcpy-server' >> ./AppDir/.env
+echo 'SCRCPY_ICON_PATH=${SHARUN_DIR}/icon.png'            >> ./AppDir/.env
 
-	cp -v ./icon.png ./.DirIcon
-	cp -v ./icon.png ./scrcpy.png
-	mv -v ./icon.png ./bin
+# Add udev rules
+mkdir -p ./AppDir/etc/udev/rules.d
+wget --retry-connrefused --tries=30 "$UDEV" -O ./AppDir/etc/udev/rules.d/51-android.rules
 
-	# get server binary
-	cp -v /usr/share/scrcpy/scrcpy-server ./bin/scrcpy-server
-	
-	# desktop, icon, app data files
-	wget --retry-connrefused --tries=30 "$DESKTOP" -O ./scrcpy.desktop
-	sed -i -e 's|Exec=.*|Exec=scrcpy|g' ./scrcpy.desktop
-
-	# ADD LIBRARIES
-	wget --retry-connrefused --tries=30 "$SHARUN" -O ./sharun-aio
-	chmod +x ./sharun-aio
-	xvfb-run -a -- \
-		./sharun-aio l -p -v -e -s -k \
-		./shared/bin/*                \
-		/usr/lib/lib*GL*              \
-		/usr/lib/dri/*                \
-		/usr/lib/gbm/*                \
-		/usr/lib/pipewire-*/*         \
-		/usr/lib/spa-*/*/*            \
-		/usr/lib/pulseaudio/*         \
-		/usr/lib/gconv/*
-	rm -f ./sharun-aio
-
-	# Prepare sharun
-	chmod +x ./AppRun
-	./sharun -g
-
-	# Add udev rules installer
-	git clone "https://github.com/M0Rf30/android-udev-rules.git" ./udev-installer
-	rm -rf ./udev-installer/.github ./udev-installer/.git
-)
-
-VERSION="$(./AppDir/AppRun --version | awk '{print $2; exit}')"
-[ -n "$VERSION" ] && echo "$VERSION" > ~/version
+# We also need to be added to a group after installing udev rules
+sed -i '/cp -v/a	 groupadd -f adbusers; usermod -a -G adbusers $(logname)' ./AppDir/bin/udev-installer.hook
 
 # MAKE APPIMAGE WITH URUNTIME
-wget --retry-connrefused --tries=30 "$URUNTIME"      -O  ./uruntime
-wget --retry-connrefused --tries=30 "$URUNTIME_LITE" -O  ./uruntime-lite
-chmod +x ./uruntime*
+export VERSION="$(./AppDir/AppRun --version | awk '{print $2; exit}')"
+export OUTNAME=scrcpy-"$VERSION"-anylinux-"$ARCH".AppImage
+[ -n "$VERSION" ] && echo "$VERSION" > ~/version
 
-# Add udpate info to runtime
-echo "Adding update information \"$UPINFO\" to runtime..."
-./uruntime-lite --appimage-addupdinfo "$UPINFO"
+wget --retry-connrefused --tries=30 "$URUNTIME" -O ./uruntime2appimage
+chmod +x ./uruntime2appimage
+./uruntime2appimage
 
-echo "Generating AppImage..."
-./uruntime \
-	--appimage-mkdwarfs -f               \
-	--set-owner 0 --set-group 0          \
-	--no-history --no-create-timestamp   \
-	--compression zstd:level=22 -S26 -B8 \
-	--header uruntime-lite               \
-	-i ./AppDir                          \
-	-o ./scrcpy-"$VERSION"-anylinux-"$ARCH".AppImage
 
 # make appbundle
 UPINFO="$(echo "$UPINFO" | sed 's#.AppImage.zsync#*.AppBundle.zsync#g')"
@@ -89,8 +56,6 @@ echo "Generating [dwfs]AppBundle..."
 	--add-updinfo "$UPINFO"                   \
 	--add-appdir ./AppDir                     \
 	--output-to ./scrcpy-"$VERSION"-anylinux-"$ARCH".dwfs.AppBundle
-
-zsyncmake ./*.AppImage -u  ./*.AppImage
 zsyncmake ./*.AppBundle -u ./*.AppBundle
 
 mkdir -p ./dist
