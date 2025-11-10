@@ -3,7 +3,6 @@
 set -eux
 
 ARCH="$(uname -m)"
-URUNTIME="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/uruntime2appimage.sh"
 SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
 UDEV="https://raw.githubusercontent.com/M0Rf30/android-udev-rules/refs/heads/main/51-android.rules"
 BINS_SOURCE="$PWD"/scrcpy/release/work/build-linux-"$ARCH"/dist
@@ -29,18 +28,14 @@ echo 'SCRCPY_ICON_PATH=${SHARUN_DIR}/icon.png'            >> ./AppDir/.env
 # Add udev rules
 mkdir -p ./AppDir/etc/udev/rules.d
 wget --retry-connrefused --tries=30 "$UDEV" -O ./AppDir/etc/udev/rules.d/51-android.rules
-
 # We also need to be added to a group after installing udev rules
 sed -i '/cp -v/a	 groupadd -f adbusers; usermod -a -G adbusers $(logname)' ./AppDir/bin/udev-installer.hook
 
 # MAKE APPIMAGE WITH URUNTIME
-export VERSION="$(./AppDir/AppRun --version | awk '{print $2; exit}')"
+VERSION="$(./AppDir/AppRun --version | awk '{print $2; exit}')"
+echo "$VERSION" > ~/version
 export OUTNAME=scrcpy-"$VERSION"-anylinux-"$ARCH".AppImage
-[ -n "$VERSION" ] && echo "$VERSION" > ~/version
-
-wget --retry-connrefused --tries=30 "$URUNTIME" -O ./uruntime2appimage
-chmod +x ./uruntime2appimage
-./uruntime2appimage
+./quick-sharun --make-appimage
 
 
 # make appbundle
