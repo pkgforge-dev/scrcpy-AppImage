@@ -61,5 +61,6 @@ zsyncmake ./*.AppBundle -u ./*.AppBundle
 mkdir -p ./dist
 mv -v ./*.AppImage*  ./dist
 mv -v ./*.AppBundle* ./dist
+mv -v ~/version      ./dist
 
 echo "All Done!"
