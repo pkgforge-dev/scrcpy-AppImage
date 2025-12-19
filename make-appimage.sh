@@ -11,6 +11,7 @@ export DEPLOY_OPENGL=1
 export DEPLOY_PIPEWIRE=1
 export OUTPATH=./dist
 export ICON="$BINS_SOURCE"/icon.png
+export MAIN_BIN=scrcpy
 
 # Deploy dependencies
 quick-sharun "$BINS_SOURCE"/*
