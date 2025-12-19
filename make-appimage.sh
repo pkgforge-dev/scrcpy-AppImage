@@ -32,4 +32,4 @@ sed -i '/cp -v/a	 groupadd -f adbusers; usermod -a -G adbusers $(logname)' ./App
 # Turn AppDir into AppImage
 VERSION="$(./AppDir/AppRun --version | awk '{print $2; exit}')"
 [ -n "$VERSION" ] && export VERSION
-./quick-sharun --make-appimage
+quick-sharun --make-appimage
