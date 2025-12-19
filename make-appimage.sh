@@ -4,6 +4,8 @@ set -eux
 
 ARCH=$(uname -m)
 BINS_SOURCE="$PWD"/scrcpy/release/work/build-linux-"$ARCH"/dist
+UDEV="https://raw.githubusercontent.com/M0Rf30/android-udev-rules/refs/heads/main/51-android.rules"
+
 export ARCH
 export ADD_HOOKS="self-updater.bg.hook:udev-installer.hook"
 export UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest|*$ARCH.AppImage.zsync"
