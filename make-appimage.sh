@@ -29,7 +29,7 @@ wget --retry-connrefused --tries=30 "$UDEV" -O ./AppDir/etc/udev/rules.d/51-andr
 sed -i '/cp -v/a	 groupadd -f adbusers; usermod -a -G adbusers $(logname)' ./AppDir/bin/udev-installer.hook
 
 # Turn AppDir into AppImage
-./AppDir/AppRun --version | awk '{print $2; exit}' ~/version
+./AppDir/AppRun --version | awk '{print $2; exit}' > ~/version
 quick-sharun --make-appimage
 
 # Test the app for 12 seconds, if the test fails due to the app
