@@ -31,3 +31,7 @@ sed -i '/cp -v/a	 groupadd -f adbusers; usermod -a -G adbusers $(logname)' ./App
 # Turn AppDir into AppImage
 ./AppDir/AppRun --version | awk '{print $2; exit}' ~/version
 quick-sharun --make-appimage
+
+# Test the app for 12 seconds, if the test fails due to the app
+# having issues running in the CI use --simple-test instead
+quick-sharun --simple-test ./dist/*.AppImage
