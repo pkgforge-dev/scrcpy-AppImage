@@ -14,8 +14,12 @@ export OUTPATH=./dist
 export ICON="$BINS_SOURCE"/icon.png
 export MAIN_BIN=scrcpy
 
+# scrcpy build script just downloads the upstream android adb binary
+# which is x86_64 only, so we have to remove it and bundle the distro adb
+rm -f "$BINS_SOURCE"/adb
+
 # Deploy dependencies
-quick-sharun "$BINS_SOURCE"/*
+quick-sharun "$BINS_SOURCE"/* /usr/bin/adb
 cp -v /usr/share/scrcpy/scrcpy-server  ./AppDir/bin # get server binary
 cp -v "$BINS_SOURCE"/scrcpy.1          ./AppDir/bin # man page?
 sed -i -e 's|Exec=.*|Exec=scrcpy|g'    ./AppDir/*.desktop
