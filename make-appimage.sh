@@ -30,7 +30,7 @@ echo 'SCRCPY_ICON_PATH=${SHARUN_DIR}/icon.png'            >> ./AppDir/.env
 mkdir -p ./AppDir/etc/udev/rules.d
 wget --retry-connrefused --tries=30 "$UDEV" -O ./AppDir/etc/udev/rules.d/51-android.rules
 # We also need to be added to a group after installing udev rules
-sed -i '/cp -v/a	 groupadd -f adbusers; usermod -a -G adbusers $(logname)' ./AppDir/bin/udev-installer.hook
+sed -i "/cp -v '\$_tmp_udev_dir'/a	 groupadd -f adbusers; usermod -a -G adbusers \$(logname)" ./AppDir/bin/udev-installer.hook
 
 # Turn AppDir into AppImage
 quick-sharun --make-appimage
