@@ -8,6 +8,7 @@ echo "Installing package dependencies..."
 echo "---------------------------------------------------------------"
 pacman -Syu --noconfirm \
   	android-tools     \
+	cmake             \
 	ffmpeg            \
 	fontconfig        \
 	freetype2         \
