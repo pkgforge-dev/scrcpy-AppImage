@@ -11,7 +11,7 @@ export UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}
 export DEPLOY_OPENGL=1
 export DEPLOY_PIPEWIRE=1
 export OUTPATH=./dist
-export ICON="$BINS_SOURCE"/icon.png
+export ICON=https://raw.githubusercontent.com/Genymobile/scrcpy/refs/heads/master/app/data/scrcpy.png
 export MAIN_BIN=scrcpy
 
 # scrcpy build script just downloads the upstream android adb binary
