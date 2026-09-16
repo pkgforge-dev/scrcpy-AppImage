@@ -18,7 +18,6 @@ pacman -Syu --noconfirm \
 	ninja             \
 	patch             \
 	perl              \
-	pipewire-audio    \
 	pulseaudio        \
 	pulseaudio-alsa   \
 	scrcpy            \
