@@ -9,7 +9,7 @@ export ARCH
 export ADD_HOOKS="self-updater.hook:udev-installer.hook"
 export UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest|*$ARCH.AppImage.zsync"
 export DEPLOY_OPENGL=1
-export DEPLOY_PIPEWIRE=1
+export DEPLOY_PULSE=1
 export OUTPATH=./dist
 export ICON=https://raw.githubusercontent.com/Genymobile/scrcpy/refs/heads/master/app/data/scrcpy.png
 export MAIN_BIN=scrcpy
